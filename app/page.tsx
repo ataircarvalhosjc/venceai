@@ -28,11 +28,16 @@ export default function Home() {
 
   const getToken = async () => {
     const { data } = await supabaseBrowser.auth.getSession();
-    return data.session?.access_token;
+    if (!data.session) {
+      router.push("/login");
+      return null;
+    }
+    return data.session.access_token;
   };
 
   const carregar = async () => {
     const token = await getToken();
+    if (!token) return;
     const res = await fetch("/api/produtos", { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
     setProdutos(Array.isArray(data) ? data : []);
