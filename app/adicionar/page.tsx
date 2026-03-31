@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ImageIcon, X, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 export default function Adicionar() {
   const router = useRouter();
@@ -45,9 +46,11 @@ export default function Adicionar() {
   const salvar = async () => {
     if (!nome || !validade) return;
     setLoading(true);
+    const { data } = await supabaseBrowser.auth.getSession();
+    const token = data.session?.access_token;
     await fetch("/api/produtos", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({
         imageBase64: base64,
         nomeManual: nome,

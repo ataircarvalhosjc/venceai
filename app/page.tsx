@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { differenceInDays, parseISO, startOfDay } from "date-fns";
-import { Plus, Trash2, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { Plus, Trash2, AlertTriangle, CheckCircle, Clock, LogOut } from "lucide-react";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 import type { Produto } from "@/lib/supabase";
 
 function badgeValidade(validade: string) {
@@ -15,18 +17,31 @@ function badgeValidade(validade: string) {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const logout = async () => {
+    await supabaseBrowser.auth.signOut();
+    router.push("/login");
+  };
+
+  const getToken = async () => {
+    const { data } = await supabaseBrowser.auth.getSession();
+    return data.session?.access_token;
+  };
+
   const carregar = async () => {
-    const res = await fetch("/api/produtos");
+    const token = await getToken();
+    const res = await fetch("/api/produtos", { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
-    setProdutos(data ?? []);
+    setProdutos(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 
   const deletar = async (id: number) => {
-    await fetch(`/api/produtos?id=${id}`, { method: "DELETE" });
+    const token = await getToken();
+    await fetch(`/api/produtos?id=${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     setProdutos((prev) => prev.filter((p) => p.id !== id));
   };
 
@@ -43,15 +58,20 @@ export default function Home() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-teal-700">VenceAí</h1>
-            <p className="text-sm text-gray-500">{produtos.length} produto{produtos.length !== 1 ? "s" : ""} cadastrado{produtos.length !== 1 ? "s" : ""}</p>
+            <p className="text-sm text-gray-500">{produtos.length === 1 ? "1 produto cadastrado" : `${produtos.length} produtos cadastrados`}</p>
           </div>
-          <Link
-            href="/adicionar"
-            className="flex items-center gap-1 bg-teal-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-teal-700 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Adicionar
-          </Link>
+          <div className="flex items-center gap-2">
+            <button onClick={logout} className="text-gray-400 hover:text-red-500 transition-colors p-1" title="Sair">
+              <LogOut className="w-5 h-5" />
+            </button>
+            <Link
+              href="/adicionar"
+              className="flex items-center gap-1 bg-teal-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-teal-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Adicionar
+            </Link>
+          </div>
         </div>
 
         {loading ? (
