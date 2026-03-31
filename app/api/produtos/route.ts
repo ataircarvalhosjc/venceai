@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
   const { data, error } = await supabase
     .from("produtos")
-    .insert({ nome, validade, email_notificacao: emailNotificacao, dias_aviso: diasAviso ?? 7, user_id: userId })
+    .insert({ nome, validade, categoria: body.categoria ?? "Armário", email_notificacao: emailNotificacao, dias_aviso: diasAviso ?? 7, user_id: userId })
     .select()
     .single();
 

@@ -9,6 +9,7 @@ export type Produto = {
   id: number;
   nome: string;
   validade: string; // YYYY-MM-DD
+  categoria: string;
   email_notificacao: string;
   dias_aviso: number;
   criado_em: string;

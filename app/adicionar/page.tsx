@@ -6,6 +6,15 @@ import { ImageIcon, X, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 
+const CATEGORIAS = [
+  { nome: "Geladeira", emoji: "🧊" },
+  { nome: "Armário", emoji: "🗄️" },
+  { nome: "Remédios", emoji: "💊" },
+  { nome: "Beleza", emoji: "💄" },
+  { nome: "Padaria", emoji: "🍞" },
+  { nome: "Limpeza", emoji: "🧹" },
+];
+
 export default function Adicionar() {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -13,6 +22,7 @@ export default function Adicionar() {
   const [base64, setBase64] = useState<string | null>(null);
   const [nome, setNome] = useState("");
   const [validade, setValidade] = useState("");
+  const [categoria, setCategoria] = useState("Armário");
   const [email, setEmail] = useState("");
   const [diasAviso, setDiasAviso] = useState("7");
   const [loading, setLoading] = useState(false);
@@ -25,8 +35,6 @@ export default function Adicionar() {
       setPreview(dataUrl);
       const b64 = dataUrl.split(",")[1];
       setBase64(b64);
-
-      // Analisa automaticamente
       setAnalisando(true);
       try {
         const res = await fetch("/api/analisar", {
@@ -55,6 +63,7 @@ export default function Adicionar() {
         imageBase64: base64,
         nomeManual: nome,
         validadeManual: validade,
+        categoria,
         emailNotificacao: email || null,
         diasAviso: parseInt(diasAviso),
       }),
@@ -123,6 +132,26 @@ export default function Adicionar() {
                 onChange={(e) => setValidade(e.target.value)}
                 className="w-full mt-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"
               />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Categoria</label>
+              <div className="grid grid-cols-3 gap-2 mt-2">
+                {CATEGORIAS.map((cat) => (
+                  <button
+                    key={cat.nome}
+                    type="button"
+                    onClick={() => setCategoria(cat.nome)}
+                    className={`flex flex-col items-center py-2 px-1 rounded-xl border-2 text-xs font-medium transition-all ${
+                      categoria === cat.nome
+                        ? "border-teal-500 bg-teal-50 text-teal-700"
+                        : "border-gray-100 bg-white text-gray-500 hover:border-teal-200"
+                    }`}
+                  >
+                    <span className="text-xl mb-1">{cat.emoji}</span>
+                    {cat.nome}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
