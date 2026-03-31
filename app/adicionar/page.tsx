@@ -2,13 +2,12 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ImageIcon, Camera, X, Loader2, ArrowLeft } from "lucide-react";
+import { ImageIcon, X, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function Adicionar() {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const cameraRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [base64, setBase64] = useState<string | null>(null);
   const [nome, setNome] = useState("");
@@ -91,28 +90,15 @@ export default function Adicionar() {
               )}
             </div>
           ) : (
-            <div className="bg-white border-2 border-dashed border-teal-300 rounded-2xl p-6 text-center">
-              <ImageIcon className="w-10 h-10 text-teal-400 mx-auto mb-3" />
-              <p className="text-sm font-medium text-gray-600 mb-4">O app lê a validade automaticamente</p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => cameraRef.current?.click()}
-                  className="flex-1 flex items-center justify-center gap-2 bg-teal-600 text-white py-2.5 rounded-xl text-sm font-medium hover:bg-teal-700 transition-colors"
-                >
-                  <Camera className="w-4 h-4" />
-                  Câmera
-                </button>
-                <button
-                  onClick={() => fileRef.current?.click()}
-                  className="flex-1 flex items-center justify-center gap-2 bg-white border border-teal-300 text-teal-700 py-2.5 rounded-xl text-sm font-medium hover:bg-teal-50 transition-colors"
-                >
-                  <ImageIcon className="w-4 h-4" />
-                  Galeria
-                </button>
-              </div>
+            <div
+              onClick={() => fileRef.current?.click()}
+              className="bg-white border-2 border-dashed border-teal-300 rounded-2xl p-8 text-center cursor-pointer hover:border-teal-500 transition-colors"
+            >
+              <ImageIcon className="w-10 h-10 text-teal-400 mx-auto mb-2" />
+              <p className="text-sm font-medium text-gray-600">Selecionar foto do produto</p>
+              <p className="text-xs text-gray-400 mt-1">O app lê a validade automaticamente</p>
             </div>
           )}
-          <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFoto(f); }} />
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFoto(f); }} />
 
           {/* Campos */}
